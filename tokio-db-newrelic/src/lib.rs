@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate lazy_static;
 
+use std::env;
 use std::future::Future;
-use std::{env};
 
 use newrelic::{self, App, NewRelicConfig, Transaction};
 use std::cell::RefCell;
@@ -14,7 +14,7 @@ tokio::task_local! {
 
 pub fn create_transaction(name: &str) -> RefCell<Option<newrelic::Transaction>> {
     RefCell::new(match NR_APP.web_transaction(name) {
-        Ok(trans) => None,// Some(trans),
+        Ok(trans) => Some(trans),
         Err(e) => {
             println!("Error init web transaction {} :: {:?}", name, e);
             None
@@ -41,8 +41,8 @@ lazy_static! {
 }
 
 pub async fn execute<F>(transaction_name: &str, f: F) -> F::Output
-    where
-        F: Future,
+where
+    F: Future,
 {
     TL_TRANSACTION
         .scope(create_transaction(transaction_name), f)
@@ -52,10 +52,10 @@ pub async fn execute<F>(transaction_name: &str, f: F) -> F::Output
 pub async fn abc1() {
     TL_TRANSACTION.inner.with(|value| {
         match value.borrow().as_ref() {
-          Some(tr) => {
-              println!("TL Option valueeee: {:#?}", tr.borrow().is_some());
-          },
-          None => {}
+            Some(tr) => {
+                println!("TL Option valueeee: {:#?}", tr.borrow().is_some());
+            }
+            None => {}
         };
         // println!("TL Option valueeee: {:#?}", value.borrow().is_some());
     });
