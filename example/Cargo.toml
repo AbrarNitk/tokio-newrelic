@@ -1,0 +1,18 @@
+[package]
+name = "example"
+version = "0.1.0"
+authors = ["AbrarNitk <abrar.nitk@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-rt = "1.0.0"
+actix-web = "2.0.0"
+actix-utils = "1.0.3"
+futures = "0.3.1"
+tokio-db-newrelic = {path="../"}
+
+[dependencies.tokio]
+version = "0.2.21"
+features = ["rt-core", "rt-util", "time"]
