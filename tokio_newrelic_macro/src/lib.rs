@@ -16,8 +16,7 @@ pub fn temp_newrelic(
     metadata: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    let input_fn: syn::ItemFn =
-        parse_macro_input!(input as syn::ItemFn);
+    let input_fn: syn::ItemFn = parse_macro_input!(input as syn::ItemFn);
     let visibility = input_fn.vis;
     let asyncness = input_fn.sig.asyncness;
     let generics = &input_fn.sig.generics;
@@ -35,17 +34,20 @@ pub fn temp_newrelic(
             let r = f();
             r
         }
-    )).into()
+    ))
+    .into()
 }
 
 // task_local!(static REQUEST_ID: Cell<u64> = Cell::new(0));
 
 async fn abc() -> i32 {
     println!("value {}", NUMBER.get());
-    let t = NUMBER.scope(1, async move {
-        println!("value {}", NUMBER.get());
-        return 2;
-    }).await;
+    let t = NUMBER
+        .scope(1, async move {
+            println!("value {}", NUMBER.get());
+            return 2;
+        })
+        .await;
     t
 }
 
@@ -67,18 +69,19 @@ mod tests {
     fn it_works() {
         let mut rt = Runtime::new().unwrap();
         rt.block_on(async {
-//            super::abc1();
-//            super::abc2();
-            super::NUMBER.scope(1, async move {
-                let t = super::abc().await;
-                println!("Value of t: {}", t);
-                super::abc1();
-                super::abc2();
-            }).await;
+            //            super::abc1();
+            //            super::abc2();
+            super::NUMBER
+                .scope(1, async move {
+                    let t = super::abc().await;
+                    println!("Value of t: {}", t);
+                    super::abc1();
+                    super::abc2();
+                })
+                .await;
         });
 
         // std::thread::sleep(std::time::Duration::from_secs(1));
         assert_eq!(2 + 2, 4);
     }
 }
-

@@ -18,11 +18,11 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     HttpServer::new(|| {
-        App::new()
-            .service(index)
-//            .route("/", web::get().to(index))
+        App::new().service(index)
+        //            .route("/", web::get().to(index))
     })
-        .bind(&addr)
-        .unwrap()
-        .run().await
+    .bind(&addr)
+    .unwrap()
+    .run()
+    .await
 }
