@@ -11,7 +11,8 @@ actix-rt = "1.0.0"
 actix-web = "2.0.0"
 actix-utils = "1.0.3"
 futures = "0.3.1"
-#tokio-db-newrelic = {path="../"}
+tokio-db-newrelic = {path="../tokio-db-newrelic"}
+tokio_newrelic_macro = {path="../tokio_newrelic_macro"}
 
 [dependencies.tokio]
 version = "0.2.21"

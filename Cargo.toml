@@ -6,7 +6,7 @@
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["example", "tokio_newrelic_macro"]
+members = ["example", "tokio_newrelic_macro", "tokio-db-newrelic"]
 
 #[dependencies]
 #

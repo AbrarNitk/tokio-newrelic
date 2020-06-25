@@ -7,7 +7,7 @@ extern crate example;
 #[get("/")]
 async fn index(_req: HttpRequest) -> impl Responder {
     let t = example::abc().await;
-    HttpResponse::Ok().body(format!("index_page {}", t))
+    HttpResponse::Ok().body(format!("index_page {:?}", t))
 }
 
 #[actix_rt::main]
@@ -17,12 +17,9 @@ async fn main() -> std::io::Result<()> {
         .parse()
         .unwrap();
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
-    HttpServer::new(|| {
-        App::new().service(index)
-        //            .route("/", web::get().to(index))
-    })
-    .bind(&addr)
-    .unwrap()
-    .run()
-    .await
+    HttpServer::new(|| App::new().service(index))
+        .bind(&addr)
+        .unwrap()
+        .run()
+        .await
 }
