@@ -9,17 +9,17 @@ use std::cell::RefCell;
 use std::str::FromStr;
 
 tokio::task_local! {
-    pub static TL_TRANSACTION: RefCell<Option<newrelic::Transaction>>;
+    pub static TL_TRANSACTION: Option<newrelic::Transaction>;
 }
 
-pub fn create_transaction(name: &str) -> RefCell<Option<newrelic::Transaction>> {
-    RefCell::new(match NR_APP.web_transaction(name) {
+pub fn create_transaction(name: &str) -> Option<newrelic::Transaction> {
+    match NR_APP.web_transaction(name) {
         Ok(trans) => Some(trans),
         Err(e) => {
             println!("Error init web transaction {} :: {:?}", name, e);
             None
         }
-    })
+    }
 }
 
 fn init_nr_app() -> App {
@@ -53,7 +53,7 @@ pub async fn abc1() {
     TL_TRANSACTION.inner.with(|value| {
         match value.borrow().as_ref() {
             Some(tr) => {
-                println!("TL Option valueeee: {:#?}", tr.borrow().is_some());
+                println!("TL Option valueeee: {:#?}", tr.is_some());
             }
             None => {}
         };
