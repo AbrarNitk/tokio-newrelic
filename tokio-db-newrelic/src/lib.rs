@@ -4,21 +4,27 @@ extern crate lazy_static;
 use std::env;
 use std::future::Future;
 
-use newrelic::{self, App, NewRelicConfig, Transaction};
-use std::cell::RefCell;
+use newrelic::{self, App};
 use std::str::FromStr;
+
+pub mod newrelic_fns;
 
 tokio::task_local! {
     pub static TL_TRANSACTION: Option<newrelic::Transaction>;
 }
 
-pub fn create_transaction(name: &str) -> Option<newrelic::Transaction> {
-    match NR_APP.web_transaction(name) {
-        Ok(trans) => Some(trans),
-        Err(e) => {
-            println!("Error init web transaction {} :: {:?}", name, e);
-            None
+fn create_transaction(name: &str) -> Option<newrelic::Transaction> {
+    if *crate::ENABLE_NEW_RELIC {
+        match NR_APP.web_transaction(name) {
+            Ok(trans) => Some(trans),
+            Err(e) => {
+                println!("Error init web transaction {} :: {:?}", name, e);
+                None
+            }
         }
+    } else {
+        println!("Newrelic is not enabled for starting a web transaction");
+        None
     }
 }
 
@@ -59,4 +65,6 @@ pub async fn abc1() {
         };
         // println!("TL Option valueeee: {:#?}", value.borrow().is_some());
     });
+
+    // crate::newrelic_fns::start_custom_segment("abc1");
 }
