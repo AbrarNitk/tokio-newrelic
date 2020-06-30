@@ -9,6 +9,7 @@ use std::str::FromStr;
 
 pub mod newrelic_fns;
 pub mod pg;
+pub mod pg_pool;
 pub(crate) mod sql_parser;
 
 tokio::task_local! {

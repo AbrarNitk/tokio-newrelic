@@ -18,11 +18,8 @@ pub fn temp_newrelic(
     let output = input_fn.sig.output;
     let where_clause = &input_fn.sig.generics.where_clause;
     let block = input_fn.block;
-
-    // proc_macro::TokenStream::from(input).into()
     (quote!(
         #visibility #asyncness fn #ident #generics (#inputs) #output #where_clause {
-            println!("macro is working fine");
             let f = move || async move { #block };
             let r = tokio_db_newrelic::execute(#ident_name, async move {
                 f().await

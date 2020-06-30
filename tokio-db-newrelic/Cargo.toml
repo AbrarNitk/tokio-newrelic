@@ -11,6 +11,7 @@ newrelic = "0.2"
 lazy_static = "1"
 antidote = "1.0.0"
 sqlparser = "0.5.1"
+r2d2 = "0.8.8"
 
 diesel = { version = "1.4.5", features = ["r2d2", "chrono", "postgres"] }
 r2d2-diesel = "1.0.0"

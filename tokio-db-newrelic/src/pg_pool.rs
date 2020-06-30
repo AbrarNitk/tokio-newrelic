@@ -7,7 +7,6 @@ lazy_static! {
     > = antidote::RwLock::new(std::collections::HashMap::new());
 }
 
-
 fn _connection_pool<T: Into<String>>(
     url: T,
 ) -> r2d2::Pool<r2d2_diesel::ConnectionManager<crate::pg::NConnection>> {
@@ -37,6 +36,7 @@ pub fn connection_with_url(
     }
 }
 
-pub fn connection() -> r2d2::PooledConnection<r2d2_diesel::ConnectionManager<crate::pg::NConnection>> {
+pub fn connection() -> r2d2::PooledConnection<r2d2_diesel::ConnectionManager<crate::pg::NConnection>>
+{
     connection_with_url(std::env::var("PG_DATABASE_URL").expect("DATABASE_URL not set"))
 }
