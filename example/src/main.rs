@@ -1,5 +1,5 @@
 //use actix_web::http::header::ContentType;
-use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{get, App, HttpRequest, HttpResponse, HttpServer, Responder};
 //use std::io::prelude::*;
 use std::net::SocketAddr;
 extern crate example;
