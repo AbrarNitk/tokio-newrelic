@@ -35,55 +35,47 @@ impl OConnection {
     }
 }
 
+fn execute_fn<U, F: FnOnce() -> U>(table: &str, operation: &str, f: F) -> U {
+    let segment_params = DatastoreParamsBuilder::new(Datastore::Postgres)
+        .collection(&table)
+        .operation(&operation)
+        .build()
+        .expect("Invalid data store parameters");
+
+    TL_TRANSACTION.inner.with(|value| {
+        let t = value.borrow();
+        if let Some(v) = t.as_ref() {
+            if let Some(trans) = v.as_ref() {
+                trans.datastore_segment(&segment_params, |_| f())
+            } else {
+                f()
+            }
+        } else {
+            f()
+        }
+    })
+}
+
 impl diesel::connection::Connection for OConnection {
     type Backend = diesel::pg::Pg;
     type TransactionManager = diesel::connection::AnsiTransactionManager;
 
     fn establish(url: &str) -> ConnectionResult<Self> {
+        let f = || OConnection::new(url);
         if *ENABLE_NEW_RELIC {
-            let segment_params = DatastoreParamsBuilder::new(Datastore::Postgres)
-                .collection("establish_connection")
-                .build()
-                .expect("Invalid data store parameters");
-            TL_TRANSACTION.inner.with(|value| {
-                value.borrow().as_ref().map_or_else(
-                    || OConnection::new(url),
-                    |trans| {
-                        trans.as_ref().map_or_else(
-                            || OConnection::new(url),
-                            |t| t.datastore_segment(&segment_params, |_| OConnection::new(url)),
-                        )
-                    },
-                )
-            })
+            execute_fn("connection", "establish_connection", f)
         } else {
-            OConnection::new(url)
+            f()
         }
     }
 
     fn execute(&self, query: &str) -> QueryResult<usize> {
+        let f = || self.conn.execute(query);
         if *ENABLE_NEW_RELIC {
             let (operation, table) = crate::sql_parser::parse_sql(&query);
-            let segment_params = DatastoreParamsBuilder::new(Datastore::Postgres)
-                .collection(&table)
-                .operation(&operation)
-                .query(&query.replace("\"", ""))
-                .build()
-                .expect("Invalid data store segment parameters");
-
-            TL_TRANSACTION.inner.with(|value| {
-                value.borrow().as_ref().map_or_else(
-                    || self.conn.execute(query),
-                    |trans| {
-                        trans.as_ref().map_or_else(
-                            || self.conn.execute(query),
-                            |t| t.datastore_segment(&segment_params, |_| self.conn.execute(query)),
-                        )
-                    },
-                )
-            })
+            execute_fn(&table, &operation, f)
         } else {
-            self.conn.execute(query)
+            f()
         }
     }
 
