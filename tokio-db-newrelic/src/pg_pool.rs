@@ -18,14 +18,14 @@ fn _connection_pool<T: Into<String>>(
 }
 
 pub fn connection_with_url(
-    db_url: String,
+    db_url: &str,
 ) -> r2d2::PooledConnection<r2d2_diesel::ConnectionManager<crate::pg::NConnection>> {
     {
-        if let Some(pool) = PG_POOLS.read().get(&db_url) {
+        if let Some(pool) = PG_POOLS.read().get(&db_url.to_string()) {
             return pool.get().unwrap();
         }
     }
-    match PG_POOLS.write().entry(db_url.clone()) {
+    match PG_POOLS.write().entry(db_url.to_string()) {
         std::collections::hash_map::Entry::Vacant(e) => {
             let conn_pool = _connection_pool(db_url);
             let conn = conn_pool.get().unwrap();
@@ -38,5 +38,5 @@ pub fn connection_with_url(
 
 pub fn connection() -> r2d2::PooledConnection<r2d2_diesel::ConnectionManager<crate::pg::NConnection>>
 {
-    connection_with_url(std::env::var("PG_DATABASE_URL").expect("DATABASE_URL not set"))
+    connection_with_url(&std::env::var("PG_DATABASE_URL").expect("DATABASE_URL not set"))
 }
