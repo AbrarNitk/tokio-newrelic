@@ -17,3 +17,18 @@ tokio_newrelic_macro = {path="../tokio_newrelic_macro"}
 [dependencies.tokio]
 version = "0.2.21"
 features = ["rt-core", "rt-util", "time"]
+
+[dependencies.diesel]
+version = "= 1.4.5"
+features = [
+    "postgres",
+    "mysql",
+#    "64-column-tables",
+    "serde_json",
+#    "network-address",
+    "chrono",
+#    "bigdecimal",
+#    "num-bigint",
+#    "num-integer",
+#    "num-traits",
+]
