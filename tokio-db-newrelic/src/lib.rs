@@ -8,6 +8,8 @@ use newrelic::{self, App};
 use std::str::FromStr;
 
 pub mod newrelic_fns;
+pub mod pg;
+pub(crate) mod sql_parser;
 
 tokio::task_local! {
     pub static TL_TRANSACTION: Option<newrelic::Transaction>;
