@@ -35,10 +35,11 @@ impl OConnection {
     }
 }
 
-fn execute_fn<U, F: FnOnce() -> U>(table: &str, operation: &str, f: F) -> U {
+fn execute_fn<U, F: FnOnce() -> U>(table: &str, operation: &str, query: &str, f: F) -> U {
     let segment_params = DatastoreParamsBuilder::new(Datastore::Postgres)
         .collection(&table)
         .operation(&operation)
+        .query(&query.replace("\"", ""))
         .build()
         .expect("Invalid data store parameters");
 
@@ -63,7 +64,7 @@ impl diesel::connection::Connection for OConnection {
     fn establish(url: &str) -> ConnectionResult<Self> {
         let f = || OConnection::new(url);
         if *ENABLE_NEW_RELIC {
-            execute_fn("connection", "establish_connection", f)
+            execute_fn("connection", "establish_connection", "", f)
         } else {
             f()
         }
@@ -73,7 +74,7 @@ impl diesel::connection::Connection for OConnection {
         let f = || self.conn.execute(query);
         if *ENABLE_NEW_RELIC {
             let (operation, table) = crate::sql_parser::parse_sql(&query);
-            execute_fn(&table, &operation, f)
+            execute_fn(&table, &operation, query, f)
         } else {
             f()
         }
@@ -88,12 +89,14 @@ impl diesel::connection::Connection for OConnection {
         U: diesel::deserialize::Queryable<T::SqlType, diesel::pg::Pg>,
     {
         let query = source.as_query();
-
         let debug_query = diesel::debug_query(&query).to_string();
-        //        let (operation, table) = crate::sql_parse::parse_sql(&debug_query);
-        //        crate::observe_fields::observe_string("query", &debug_query.replace("\"", ""));
-        //        crate::observe_span_id(&format!("db__{}__{}", operation, table.replace("\"", "")));
-        self.conn.query_by_index(query)
+        let f = || self.conn.query_by_index(query);
+        if *ENABLE_NEW_RELIC {
+            let (operation, table) = crate::sql_parser::parse_sql(&debug_query);
+            execute_fn(&table, &operation, &debug_query, f)
+        } else {
+            f()
+        }
     }
 
     fn query_by_name<T, U>(&self, source: &T) -> QueryResult<Vec<U>>
@@ -101,15 +104,19 @@ impl diesel::connection::Connection for OConnection {
         T: diesel::query_builder::QueryFragment<diesel::pg::Pg> + diesel::query_builder::QueryId,
         U: diesel::deserialize::QueryableByName<diesel::pg::Pg>,
     {
-        let query = {
-            let mut qb = diesel::pg::PgQueryBuilder::default();
-            source.to_sql(&mut qb)?;
-            qb.finish()
-        };
-        //        let (operation, table) = crate::sql_parse::parse_sql(&query);
-        //        crate::observe_fields::observe_string("query", &query.replace("\"", ""));
-        //        crate::observe_span_id(&format!("db__{}__{}", operation, table.replace("\"", "")));
-        self.conn.query_by_name(source)
+        let f = || self.conn.query_by_name(source);
+
+        if *ENABLE_NEW_RELIC {
+            let query = {
+                let mut qb = diesel::pg::PgQueryBuilder::default();
+                source.to_sql(&mut qb)?;
+                qb.finish()
+            };
+            let (operation, table) = crate::sql_parser::parse_sql(&query);
+            execute_fn(&table, &operation, &query, f)
+        } else {
+            f()
+        }
     }
 
     fn execute_returning_count<T>(&self, source: &T) -> QueryResult<usize>
