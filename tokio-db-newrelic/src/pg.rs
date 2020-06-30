@@ -1,10 +1,7 @@
-use diesel;
 use diesel::prelude::*;
 use diesel::query_builder::QueryBuilder;
 
-use crate::{ENABLE_NEW_RELIC, TL_TRANSACTION};
-
-use newrelic::{Datastore, DatastoreParamsBuilder};
+use crate::ENABLE_NEW_RELIC;
 
 pub struct DebugConnection {
     pub conn: diesel::PgConnection,
@@ -28,22 +25,26 @@ impl diesel::connection::SimpleConnection for OConnection {
 }
 
 impl OConnection {
-    fn new(url: &str) -> ConnectionResult<Self> {
+    fn new(url: &str) -> diesel::result::ConnectionResult<Self> {
         Ok(DebugConnection {
             conn: diesel::PgConnection::establish(url)?,
         })
     }
+
+    pub fn build_transaction(&self) -> diesel::pg::TransactionBuilder {
+        self.conn.build_transaction()
+    }
 }
 
 fn execute_fn<U, F: FnOnce() -> U>(table: &str, operation: &str, query: &str, f: F) -> U {
-    let segment_params = DatastoreParamsBuilder::new(Datastore::Postgres)
+    let segment_params = newrelic::DatastoreParamsBuilder::new(newrelic::Datastore::Postgres)
         .collection(&table)
         .operation(&operation)
         .query(&query.replace("\"", ""))
         .build()
         .expect("Invalid data store parameters");
 
-    TL_TRANSACTION.inner.with(|value| {
+    crate::TL_TRANSACTION.inner.with(|value| {
         let t = value.borrow();
         if let Some(v) = t.as_ref() {
             if let Some(trans) = v.as_ref() {
