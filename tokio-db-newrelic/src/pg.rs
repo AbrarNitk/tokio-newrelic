@@ -123,15 +123,18 @@ impl diesel::connection::Connection for OConnection {
     where
         T: diesel::query_builder::QueryFragment<diesel::pg::Pg> + diesel::query_builder::QueryId,
     {
-        let query = {
-            let mut qb = diesel::pg::PgQueryBuilder::default();
-            source.to_sql(&mut qb)?;
-            qb.finish()
-        };
-        //        let (operation, table) = crate::sql_parse::parse_sql(&query);
-        //        crate::observe_fields::observe_string("query", &query.replace("\"", ""));
-        //        crate::observe_span_id(&format!("db__{}__{}", operation, table.replace("\"", "")));
-        self.conn.execute_returning_count(source)
+        let f = || self.conn.execute_returning_count(source);
+        if *ENABLE_NEW_RELIC {
+            let query = {
+                let mut qb = diesel::pg::PgQueryBuilder::default();
+                source.to_sql(&mut qb)?;
+                qb.finish()
+            };
+            let (operation, table) = crate::sql_parser::parse_sql(&query);
+            execute_fn(&table, &operation, &query, f)
+        } else {
+            f()
+        }
     }
 
     fn transaction_manager(&self) -> &Self::TransactionManager {
