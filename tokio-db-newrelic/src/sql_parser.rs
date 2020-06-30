@@ -33,62 +33,62 @@ fn split_query_by_where(query: &str) -> String {
 pub fn parse_sql(sql: &str) -> (String, String) {
     match Parser::parse_sql(&ObserverPostgresSqlDialect {}, &split_query_by_where(sql)) {
         Ok(ast) =>
-            {
-                #[allow(clippy::never_loop)]
-                    for x in ast {
-                    match x {
-                        Statement::Query(query) => {
-                            match query.body {
-                                SetExpr::Select(select) => {
-                                    let mut table_name = vec![];
-                                    for x in select.from {
-                                        table_name.push(x.relation.to_string());
-                                        for join in x.joins {
-                                            table_name.push(join.relation.to_string());
-                                        }
+        {
+            #[allow(clippy::never_loop)]
+            for x in ast {
+                match x {
+                    Statement::Query(query) => {
+                        match query.body {
+                            SetExpr::Select(select) => {
+                                let mut table_name = vec![];
+                                for x in select.from {
+                                    table_name.push(x.relation.to_string());
+                                    for join in x.joins {
+                                        table_name.push(join.relation.to_string());
                                     }
-                                    return ("select".to_string(), table_name.join("__"));
                                 }
-                                _ => return ("unknown".to_string(), "unknown".to_string()),
-                            };
-                        }
-                        Statement::Update { table_name, .. } => {
-                            return ("update".to_string(), table_name.to_string());
-                        }
-                        Statement::Insert { table_name, .. } => {
-                            return ("insert".to_string(), table_name.to_string());
-                        }
-                        Statement::Copy { table_name, .. } => {
-                            return ("copy".to_string(), table_name.to_string());
-                        }
-                        Statement::Delete { table_name, .. } => {
-                            return ("delete".to_string(), table_name.to_string());
-                        }
-                        Statement::CreateView { name, .. } => {
-                            return ("create_view".to_string(), name.to_string());
-                        }
-                        Statement::CreateTable { name, .. } => {
-                            return ("create_table".to_string(), name.to_string());
-                        }
-                        Statement::AlterTable { name, .. } => {
-                            return ("alter".to_string(), name.to_string());
-                        }
-                        Statement::Drop { names, .. } => {
-                            return (
-                                "drop".to_string(),
-                                names
-                                    .iter()
-                                    .map(|x| x.to_string())
-                                    .collect::<Vec<String>>()
-                                    .join("__"),
-                            );
-                        }
-                        _ => {
-                            return ("unknown".to_string(), "unknown".to_string());
-                        }
+                                return ("select".to_string(), table_name.join("__"));
+                            }
+                            _ => return ("unknown".to_string(), "unknown".to_string()),
+                        };
+                    }
+                    Statement::Update { table_name, .. } => {
+                        return ("update".to_string(), table_name.to_string());
+                    }
+                    Statement::Insert { table_name, .. } => {
+                        return ("insert".to_string(), table_name.to_string());
+                    }
+                    Statement::Copy { table_name, .. } => {
+                        return ("copy".to_string(), table_name.to_string());
+                    }
+                    Statement::Delete { table_name, .. } => {
+                        return ("delete".to_string(), table_name.to_string());
+                    }
+                    Statement::CreateView { name, .. } => {
+                        return ("create_view".to_string(), name.to_string());
+                    }
+                    Statement::CreateTable { name, .. } => {
+                        return ("create_table".to_string(), name.to_string());
+                    }
+                    Statement::AlterTable { name, .. } => {
+                        return ("alter".to_string(), name.to_string());
+                    }
+                    Statement::Drop { names, .. } => {
+                        return (
+                            "drop".to_string(),
+                            names
+                                .iter()
+                                .map(|x| x.to_string())
+                                .collect::<Vec<String>>()
+                                .join("__"),
+                        );
+                    }
+                    _ => {
+                        return ("unknown".to_string(), "unknown".to_string());
                     }
                 }
             }
+        }
         Err(_err) => {
             #[cfg(debug_assertions)]
             println!("Err : {:?}", _err);
