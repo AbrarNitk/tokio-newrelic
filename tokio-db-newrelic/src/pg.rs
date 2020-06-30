@@ -16,7 +16,7 @@ impl diesel::connection::SimpleConnection for NConnection {
 }
 
 impl NConnection {
-    fn new(url: &str) -> diesel::result::ConnectionResult<Self> {
+    pub fn new(url: &str) -> diesel::result::ConnectionResult<Self> {
         Ok(DebugConnection {
             conn: diesel::PgConnection::establish(url)?,
         })
