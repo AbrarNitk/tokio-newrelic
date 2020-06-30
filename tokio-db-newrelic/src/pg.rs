@@ -9,15 +9,6 @@ pub struct DebugConnection {
 
 pub type NConnection = DebugConnection;
 
-lazy_static! {
-    pub static ref PG_POOLS: antidote::RwLock<
-        std::collections::HashMap<
-            String,
-            diesel::r2d2::Pool<r2d2_diesel::ConnectionManager<NConnection>>,
-        >,
-    > = antidote::RwLock::new(std::collections::HashMap::new());
-}
-
 impl diesel::connection::SimpleConnection for NConnection {
     fn batch_execute(&self, query: &str) -> QueryResult<()> {
         self.conn.batch_execute(query)
