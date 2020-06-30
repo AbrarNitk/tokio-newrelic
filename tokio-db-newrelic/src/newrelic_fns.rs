@@ -10,8 +10,6 @@ pub fn end_transaction() {
     }
 }
 
-
-
 // TODO: Need to change it
 #[allow(dead_code)]
 fn start_custom_segment<'a>(name: &str) -> Segment<'a> {
@@ -21,23 +19,26 @@ fn start_custom_segment<'a>(name: &str) -> Segment<'a> {
             match tr.as_ref() {
                 Some(ref val) => {
                     match val.as_ref() {
-                        Some(tr) => { tr.create_custom_segment(name, "CUSTOM"); }
-                        None => { nullable_segment(); }
+                        Some(tr) => {
+                            tr.create_custom_segment(name, "CUSTOM");
+                        }
+                        None => {
+                            nullable_segment();
+                        }
                     };
                 }
-                _ => unimplemented!()
+                _ => unimplemented!(),
             };
 
-
-//            let t = if let Some(val) = tr.borrow().as_ref() {
-//                val.borrow().as_ref().map_or_else(
-//                    || Some(nullable_segment()),
-//                    |tr| Some(tr.create_custom_segment(name, "CUSTOM")),
-//                )
-//            } else {
-//                None
-//            };
-//            t
+            //            let t = if let Some(val) = tr.borrow().as_ref() {
+            //                val.borrow().as_ref().map_or_else(
+            //                    || Some(nullable_segment()),
+            //                    |tr| Some(tr.create_custom_segment(name, "CUSTOM")),
+            //                )
+            //            } else {
+            //                None
+            //            };
+            //            t
         });
     }
     return nullable_segment();
