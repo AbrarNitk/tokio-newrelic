@@ -9,7 +9,7 @@ mod db_test;
 mod tables;
 
 #[newrelic_transaction]
-pub async fn abc() -> Option<i32> {
+pub async fn newrelic_transaction_function() -> Option<i32> {
     tokio_db_newrelic::abc1().await;
     db_test::db_test();
     db_test::db_test_pooled_connection();
@@ -17,7 +17,7 @@ pub async fn abc() -> Option<i32> {
     Some(2)
 }
 
-pub async fn abc1() -> Option<i32> {
+pub async fn newrelic_transaction_function1() -> Option<i32> {
     let r = tokio_db_newrelic::execute("web_transaction_name", async move {
         tokio_db_newrelic::abc1().await;
         db_test::db_test();

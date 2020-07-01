@@ -8,7 +8,7 @@ extern crate example;
 #[get("/")]
 async fn index(_req: HttpRequest) -> impl Responder {
     println!("path: {}", _req.path());
-    let t = example::abc().await;
+    let t = example::newrelic_transaction_function().await;
     HttpResponse::Ok().body(format!("index_page {:?}", t))
 }
 
