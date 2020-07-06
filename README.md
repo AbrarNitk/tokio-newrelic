@@ -1,4 +1,4 @@
-# tokio-db-newrelic
+# tokio-newrelic
 
 ## New Relic SDK for async tasks(tokio and actix)
 It is an wrapper over the newrelic SDK.
@@ -6,7 +6,7 @@ It is an wrapper over the newrelic SDK.
 ## Usage
 
 ```toml
-tokio-db-newrelic = "*"
+tokio-newrelic = "*"
 ```
 
 #### Export variables
@@ -18,7 +18,7 @@ export NEW_RELIC_APP_NAME="app_name"
 
 
 ```rust
-use tokio_db_newrelic;
+use tokio_newrelic;
 
 // actix api function
 #[get("/")]
@@ -30,7 +30,7 @@ async fn index(_req: HttpRequest) -> impl Responder {
 pub async fn newrelic_transaction_function1() -> Option<i32> {
     // Mandatory wrapping, with newrelic for setting task scope 
     // starting a web transaction and storing it to a tokio::Localtask 
-    let r = tokio_db_newrelic::execute("web_transaction_name", async move {
+    let r = tokio_newrelic::execute("web_transaction_name", async move {
         self::abc1().await;
         db_test();
         db_test_pooled_connection();
@@ -44,7 +44,7 @@ pub async fn newrelic_transaction_function1() -> Option<i32> {
 pub fn db_test_pooled_connection() {
     println!("pg_db_test_pooled_connection");
     let database_url = "postgres://root@127.0.0.1/acko";
-    let pooled_conn = tokio_db_newrelic::pg_pool::connection_with_url(database_url);
+    let pooled_conn = tokio_newrelic::pg_pool::connection_with_url(database_url);
     query(&pooled_conn);
 }
 
@@ -52,7 +52,7 @@ pub fn db_test_pooled_connection() {
 pub fn db_test() {
     println!("pg_db_test");
     let database_url = "postgres://root@127.0.0.1/acko";
-    let nr_conn = tokio_db_newrelic::pg::NConnection::establish(database_url)
+    let nr_conn = tokio_newrelic::pg::NConnection::establish(database_url)
         .expect(&format!("Error connecting to {}", database_url));
     query(&nr_conn);
 }
