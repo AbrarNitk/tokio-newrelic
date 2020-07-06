@@ -56,6 +56,11 @@ pub fn db_test() {
 }
 ```
 
+#### Testing 
+```shell script
+ for ((i=1;i<=100;i++)); do seq 1 200 | xargs -n2 -P20  curl "http://127.0.0.1:3000/"; done
+```
+
 - Hope that you got an idea, see the example directory for more information.
 - This crate is implemented only for datastore segment.
 

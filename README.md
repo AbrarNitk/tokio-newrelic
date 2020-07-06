@@ -58,6 +58,11 @@ pub fn db_test() {
 }
 ```
 
+#### Testing 
+```shell script
+ for ((i=1;i<=100;i++)); do seq 1 200 | xargs -n2 -P20  curl "http://127.0.0.1:3000/"; done
+```
+
 - Hope that you got an idea, see the example directory for more information.
 - This crate is implemented only for datastore segment.
 
@@ -73,3 +78,23 @@ pub fn db_test() {
 This crate requires the newrelic daemon to running as per the docs [Newrelic docs][c-sdk];
  
 [c-sdk]: https://docs.newrelic.com/docs/agents/c-sdk/get-started/introduction-c-sdk#architecture
+
+## Newrelic Transaction trace Images
+
+#### Transaction Overview
+![Overview](./images/Overview.png)
+
+#### Web Transaction
+![Web Transaction](./images/web%20transaction.png)
+
+#### Transaction details
+![Transaction details](./images/transaction%20details.png)
+
+#### Database details
+![Database](./images/Database.png)
+
+#### Transaction trace
+![Transaction trace](./images/transaction%20trace.png)
+
+#### Db queries trace
+![Db queries trace](./images/db%20queries%20traces.png)
