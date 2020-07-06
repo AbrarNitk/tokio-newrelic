@@ -1,5 +1,3 @@
-# tokio-db-newrelic
-
 ## New Relic SDK for async tasks(tokio and actix)
 It is an wrapper over the newrelic SDK.
 
