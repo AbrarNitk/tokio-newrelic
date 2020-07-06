@@ -57,18 +57,3 @@ where
         .scope(create_transaction(transaction_name), f)
         .await
 }
-
-pub async fn abc1() {
-    //let segment = crate::newrelic_fns::start_custom_segment("abc1");
-    TL_TRANSACTION.inner.with(|value| {
-        match value.borrow().as_ref() {
-            Some(_tr) => {
-                //                println!("TL Option valueeee: {:#?}", tr.is_some());
-            }
-            None => {}
-        };
-        // println!("TL Option valueeee: {:#?}", value.borrow().is_some());
-    });
-
-    // crate::newrelic_fns::end_segment(segment);
-}

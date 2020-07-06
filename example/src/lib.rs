@@ -8,9 +8,13 @@ use tokio_db_newrelic;
 mod db_test;
 mod tables;
 
+pub async fn abc1() {
+    println!("call async function");
+}
+
 #[newrelic_transaction]
 pub async fn newrelic_transaction_function() -> Option<i32> {
-    tokio_db_newrelic::abc1().await;
+    self::abc1().await;
     db_test::db_test();
     db_test::db_test_pooled_connection();
     std::thread::sleep(std::time::Duration::from_secs(2));
@@ -19,7 +23,7 @@ pub async fn newrelic_transaction_function() -> Option<i32> {
 
 pub async fn newrelic_transaction_function1() -> Option<i32> {
     let r = tokio_db_newrelic::execute("web_transaction_name", async move {
-        tokio_db_newrelic::abc1().await;
+        self::abc1().await;
         db_test::db_test();
         db_test::db_test_pooled_connection();
         std::thread::sleep(std::time::Duration::from_secs(2));
