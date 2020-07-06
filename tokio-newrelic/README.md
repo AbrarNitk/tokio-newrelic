@@ -4,7 +4,7 @@ It is an wrapper over the newrelic SDK.
 ## Usage
 
 ```toml
-tokio-db-newrelic = "*"
+tokio-newrelic = "*"
 ```
 
 #### Export variables

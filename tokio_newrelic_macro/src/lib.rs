@@ -21,7 +21,7 @@ pub fn newrelic_transaction(
     (quote!(
         #visibility #asyncness fn #ident #generics (#inputs) #output #where_clause {
             let f = move || async move { #block };
-            let r = tokio_db_newrelic::execute(#ident_name, async move {
+            let r = tokio_newrelic::execute(#ident_name, async move {
                 f().await
             }).await;
             r

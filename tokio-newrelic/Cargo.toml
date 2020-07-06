@@ -1,5 +1,5 @@
 [package]
-name = "tokio-db-newrelic"
+name = "tokio-newrelic"
 version = "0.1.0"
 authors = ["AbrarNitk <abrar.nitk@gmail.com>"]
 description = "It is an wrapper over the newrelic SDK."

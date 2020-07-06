@@ -1,9 +1,9 @@
 use crate::tables::{users_skill::dsl, users_skill::dsl::users_skill};
 
-use tokio_db_newrelic;
+use tokio_newrelic;
 
 use diesel::prelude::*;
-use tokio_db_newrelic::pg::NConnection;
+use tokio_newrelic::pg::NConnection;
 
 #[derive(Queryable, Debug)]
 pub struct Skill {
@@ -24,7 +24,7 @@ fn query(conn: &NConnection) {
 pub fn db_test() {
     println!("pg_db_test");
     let database_url = "postgres://root@127.0.0.1/acko";
-    let nr_conn = tokio_db_newrelic::pg::NConnection::establish(database_url)
+    let nr_conn = tokio_newrelic::pg::NConnection::establish(database_url)
         .expect(&format!("Error connecting to {}", database_url));
     query(&nr_conn);
 }
@@ -32,6 +32,6 @@ pub fn db_test() {
 pub fn db_test_pooled_connection() {
     println!("pg_db_test_pooled_connection");
     let database_url = "postgres://root@127.0.0.1/acko";
-    let pooled_conn = tokio_db_newrelic::pg_pool::connection_with_url(database_url);
+    let pooled_conn = tokio_newrelic::pg_pool::connection_with_url(database_url);
     query(&pooled_conn);
 }
